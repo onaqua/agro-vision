@@ -62,10 +62,10 @@ public class YoloModel : IDisposable
     private bool _disposed = false;
 
     // Model configuration constants
-    private const int MODEL_INPUT_SIZE = 640;
-    private const float DEFAULT_CONFIDENCE_THRESHOLD = 0.1f;
-    private const float DEFAULT_IOU_THRESHOLD = 0.5f;
-    private const int VALUES_PER_DETECTION = 6; // [x1, y1, x2, y2, confidence, class_id]
+    private const int ModelInputSize = 640;
+    private const float DefaultConfidenceTreshold = 0.1f;
+    private const float DefaultIouTreshold = 0.5f;
+    private const int ValuesPerDetection = 6; // [x1, y1, x2, y2, confidence, class_id]
 
     /// <summary>
     /// Initializes a new instance of YOLO model wrapper
@@ -194,14 +194,14 @@ public class YoloModel : IDisposable
         using var resizedImage = new Mat();
 
         // Resize image to model input size while maintaining aspect ratio
-        Cv2.Resize(image, resizedImage, new Size(MODEL_INPUT_SIZE, MODEL_INPUT_SIZE));
+        Cv2.Resize(image, resizedImage, new Size(ModelInputSize, ModelInputSize));
 
-        var tensor = new DenseTensor<float>(new[] { 1, 3, MODEL_INPUT_SIZE, MODEL_INPUT_SIZE });
+        var tensor = new DenseTensor<float>(new[] { 1, 3, ModelInputSize, ModelInputSize });
 
         // Process each pixel for normalization and format conversion
-        for (int y = 0; y < MODEL_INPUT_SIZE; y++)
+        for (int y = 0; y < ModelInputSize; y++)
         {
-            for (int x = 0; x < MODEL_INPUT_SIZE; x++)
+            for (int x = 0; x < ModelInputSize; x++)
             {
                 var pixel = resizedImage.Get<Vec3b>(y, x);
 
@@ -213,7 +213,7 @@ public class YoloModel : IDisposable
             }
         }
 
-        Console.WriteLine($"Image preprocessing completed: {image.Width}x{image.Height} -> {MODEL_INPUT_SIZE}x{MODEL_INPUT_SIZE}");
+        Console.WriteLine($"Image preprocessing completed: {image.Width}x{image.Height} -> {ModelInputSize}x{ModelInputSize}");
         return tensor;
     }
 
@@ -264,7 +264,7 @@ public class YoloModel : IDisposable
     private List<DetectionResult> ProcessModelOutputs(Tensor<float> output, int originalWidth, int originalHeight)
     {
         var predictions = output.ToArray();
-        int numDetections = predictions.Length / VALUES_PER_DETECTION;
+        int numDetections = predictions.Length / ValuesPerDetection;
 
         Console.WriteLine($"Processing {numDetections} raw detections from model output");
 
@@ -272,7 +272,7 @@ public class YoloModel : IDisposable
 
         for (int i = 0; i < numDetections; i++)
         {
-            int baseIndex = i * VALUES_PER_DETECTION;
+            int baseIndex = i * ValuesPerDetection;
 
             // Extract detection values - format: [x1, y1, x2, y2, confidence, class_id]
             float x1 = predictions[baseIndex];
@@ -283,7 +283,7 @@ public class YoloModel : IDisposable
             int classId = (int)predictions[baseIndex + 5];
 
             // Apply confidence threshold
-            if (confidence < DEFAULT_CONFIDENCE_THRESHOLD)
+            if (confidence < DefaultConfidenceTreshold)
                 continue;
 
             // Validate class ID
@@ -297,7 +297,7 @@ public class YoloModel : IDisposable
             rawResults.Add(detection);
         }
 
-        Console.WriteLine($"{rawResults.Count} detections passed confidence threshold ({DEFAULT_CONFIDENCE_THRESHOLD})");
+        Console.WriteLine($"{rawResults.Count} detections passed confidence threshold ({DefaultConfidenceTreshold})");
 
         // Apply Non-Maximum Suppression to remove duplicates
         return ApplyNonMaximumSuppression(rawResults);
@@ -320,8 +320,8 @@ public class YoloModel : IDisposable
         int originalWidth, int originalHeight)
     {
         // Convert normalized coordinates to original image space
-        float scaleX = originalWidth / (float)MODEL_INPUT_SIZE;
-        float scaleY = originalHeight / (float)MODEL_INPUT_SIZE;
+        float scaleX = originalWidth / (float)ModelInputSize;
+        float scaleY = originalHeight / (float)ModelInputSize;
 
         x1 *= scaleX;
         y1 *= scaleY;
@@ -365,7 +365,7 @@ public class YoloModel : IDisposable
     /// <returns>Filtered detections after NMS application</returns>
     private static List<DetectionResult> ApplyNonMaximumSuppression(
         List<DetectionResult> detections,
-        float iouThreshold = DEFAULT_IOU_THRESHOLD)
+        float iouThreshold = DefaultIouTreshold)
     {
         var results = new List<DetectionResult>();
         var remainingDetections = new List<DetectionResult>(detections.OrderByDescending(d => d.Confidence));
