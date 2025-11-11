@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AgroVision.YoloConverter": {
+      "commandName": "Project"
+    },
+    "AgroVision.Demo": {
+      "commandName": "Project"
+    }
+  }
+}
