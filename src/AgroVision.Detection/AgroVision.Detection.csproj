@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Images\potatoes.jpg">
+    <None Update="Resources\Images\potatoes_with_bb.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Weights\leaves-detection.onnx">
