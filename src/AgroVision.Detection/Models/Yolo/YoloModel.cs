@@ -114,10 +114,10 @@ public class YoloModel : IDisposable
         try
         {
             // Prefer GPU execution for better performance
-            options.AppendExecutionProvider_CPU();
+            // options.AppendExecutionProvider_CPU();
 
             // Note: In production, consider adding CUDA/DirectML providers
-            // options.AppendExecutionProvider_Cuda(0); // For NVIDIA GPUs
+            options.AppendExecutionProvider_CUDA(0); // For NVIDIA GPUs
             // options.AppendExecutionProvider_DML(0);  // For DirectML (Windows)
 
             options.EnableMemoryPattern = false; // Better for variable input sizes
